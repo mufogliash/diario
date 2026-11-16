@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diario lattosio e flatulenza</title>
+<meta name="theme-color" content="#2a78d6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lattosio">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f4f2; --surface:#fcfcfb; --line:#e3e2de; --grid:#ecebe7;
+  --text:#0b0b0b; --text2:#52514e; --muted:#8a8984;
+  --accent:#2a78d6; --s1:#2a78d6; --s2:#eb6834; --danger:#c43b3a;
+  --radius:12px;
+}
+@media (prefers-color-scheme:dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme:dark;
+    --bg:#121211; --surface:#1a1a19; --line:#2e2e2c; --grid:#262624;
+    --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88;
+    --accent:#3987e5; --s1:#3987e5; --s2:#d95926; --danger:#e66767;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121211; --surface:#1a1a19; --line:#2e2e2c; --grid:#262624;
+  --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88;
+  --accent:#3987e5; --s1:#3987e5; --s2:#d95926; --danger:#e66767;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);
+  font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+main{max-width:560px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))}
+h1{font-size:17px;font-weight:600;margin:4px 2px 10px}
+h2{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text2);margin:0 0 10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.daynav .lbl{font-weight:600;text-align:center;flex:1}
+.daynav .lbl small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.iconbtn{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:20px}
+.iconbtn:disabled{opacity:.35}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px}
+.stat .k{font-size:12px;color:var(--text2)}
+.stat .v{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px}
+.stat .v small{font-size:13px;font-weight:400;color:var(--text2)}
+label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px}
+input{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;
+  padding:10px 12px;width:100%;min-height:44px;font-size:16px}
+input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.est{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--bg);font-size:14px;color:var(--text2);min-height:44px}
+.est b{color:var(--text)}
+.primary{width:100%;min-height:46px;margin-top:12px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-weight:600}
+.primary:disabled{opacity:.4}
+.ghost{border:1px solid var(--line);background:transparent;border-radius:10px;padding:8px 12px;min-height:40px;font-size:14px}
+.intens{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.intens button{min-height:64px;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:6px 2px}
+.intens button b{display:block;font-size:20px}
+.intens button span{display:block;font-size:11px;color:var(--text2)}
+.intens button:active{background:var(--line)}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.list li:first-child{border-top:0}
+.list .t{font-variant-numeric:tabular-nums;color:var(--text2);width:44px;flex:none}
+.list .dot{width:8px;height:8px;border-radius:50%;flex:none}
+.list .d{flex:1;min-width:0}
+.list .d small{color:var(--muted)}
+.list .del{border:0;background:transparent;color:var(--muted);min-width:44px;min-height:36px;border-radius:8px;font-size:13px}
+.list .del.armed{color:#fff;background:var(--danger)}
+.empty{color:var(--muted);font-size:14px;padding:6px 0}
+.readout{font-size:13px;color:var(--text2);min-height:20px;margin-bottom:4px;font-variant-numeric:tabular-nums}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{fill:var(--muted);font-size:10px;font-family:inherit}
+.chartttl{font-size:13px;font-weight:600;margin:10px 0 2px}
+.chartttl:first-of-type{margin-top:0}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--surface);
+  padding:8px 14px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:.92}
+.sync{font-size:12px;color:var(--muted);text-align:center;margin-top:6px}
+.sync button{font-size:12px;padding:4px 10px;min-height:0;margin-left:6px}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:6px 4px;border-top:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--text2);font-weight:500}
+.flex{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.hidden{display:none!important}
+.note{font-size:12px;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Diario lattosio e flatulenza</h1>
+
+  <div class="daynav">
+    <button class="iconbtn" id="prev" aria-label="Giorno precedente">‹</button>
+    <div class="lbl" id="daylbl"></div>
+    <button class="iconbtn" id="next" aria-label="Giorno successivo">›</button>
+  </div>
+
+  <div class="stats" style="margin-bottom:12px">
+    <div class="stat"><div class="k">Lattosio</div><div class="v" id="sLat">0 <small>g</small></div></div>
+    <div class="stat"><div class="k">Episodi</div><div class="v" id="sN">0</div></div>
+    <div class="stat"><div class="k">Intensità media</div><div class="v" id="sI">–</div></div>
+  </div>
+
+  <section class="card">
+    <h2>Registra episodio</h2>
+    <div class="row" style="grid-template-columns:1fr;margin-top:0">
+      <div><label for="fTime">Orario</label><input type="time" id="fTime"></div>
+    </div>
+    <div class="intens" id="intens"></div>
+    <div class="note">Tocca l'intensità per salvare subito l'episodio.</div>
+  </section>
+
+  <section class="card">
+    <h2>Aggiungi alimento</h2>
+    <label for="food">Alimento</label>
+    <input id="food" list="foodlist" autocomplete="off" placeholder="es. cappuccino, mozzarella, gelato">
+    <datalist id="foodlist"></datalist>
+    <div class="row">
+      <div><label for="grams">Peso (g o ml)</label><input id="grams" type="number" inputmode="decimal" min="0" step="1" placeholder="es. 150"></div>
+      <div><label for="cTime">Orario</label><input type="time" id="cTime"></div>
+    </div>
+    <div class="row">
+      <div><label for="per100">Lattosio per 100 g</label><input id="per100" type="number" inputmode="decimal" min="0" step="0.1" placeholder="stima"></div>
+      <div></div>
+    </div>
+    <div class="est" id="est">Inserisci alimento e peso: il lattosio viene stimato automaticamente.</div>
+    <button class="primary" id="saveFood" disabled>Salva alimento</button>
+  </section>
+
+  <section class="card">
+    <h2>Andamento della giornata</h2>
+    <div class="readout" id="tlRead">Tocca un punto per i dettagli.</div>
+    <svg id="timeline" viewBox="0 0 340 96" role="img" aria-label="Alimenti ed episodi nelle 24 ore"></svg>
+    <div class="note">Sopra: alimenti (dimensione = lattosio). Sotto: episodi (altezza = intensità).</div>
+  </section>
+
+  <section class="card">
+    <h2>Diario del giorno</h2>
+    <ul class="list" id="list"></ul>
+  </section>
+
+  <section class="card">
+    <div class="flex" style="margin-bottom:10px"><h2 style="margin:0">Ultimi 14 giorni</h2>
+      <button class="ghost" id="tblToggle">Tabella</button></div>
+    <div id="charts">
+      <div class="chartttl">Lattosio (g)</div>
+      <div class="readout" id="r1"></div>
+      <svg id="c1" viewBox="0 0 340 110" role="img" aria-label="Lattosio giornaliero"></svg>
+      <div class="chartttl" style="margin-top:14px">Episodi (numero)</div>
+      <div class="readout" id="r2"></div>
+      <svg id="c2" viewBox="0 0 340 110" role="img" aria-label="Episodi giornalieri"></svg>
+    </div>
+    <div id="tbl" class="hidden"></div>
+    <div id="insight" class="note"></div>
+  </section>
+
+  <section class="card">
+    <h2>Dati e backup</h2>
+    <div class="flex" style="justify-content:flex-start">
+      <button class="ghost" id="csv">Esporta CSV</button>
+      <button class="ghost" id="backup">Salva backup</button>
+      <button class="ghost" id="restoreBtn">Ripristina backup</button>
+      <input type="file" id="restore" accept="application/json,.json" class="hidden">
+    </div>
+    <div class="note" id="backupInfo"></div>
+    <div class="note">Le stime di lattosio sono indicative: si basano su valori medi per alimento e possono variare con marca e ricetta. Puoi sempre correggere il valore per 100 g prima di salvare.</div>
+  </section>
+
+  <div class="sync" id="sync">I dati restano solo su questo telefono.</div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+var LS="diario-lattosio-v1", LSB="diario-lattosio-ultimo-backup";
+var S;
+try { S = JSON.parse(localStorage.getItem(LS)); } catch(e){ S = null; }
+if(!S || !Array.isArray(S.entries)) S = {v:1,updatedAt:0,entries:[],custom:{}};
+if(!S.custom) S.custom = {};
+
+// ---------- Food table: grams of lactose per 100 g (average values) ----------
+var FOODS = [
+ // --- Latte e bevande ---
+ ["latte intero",4.8,["latte","latte vaccino","latte fresco","latte uht"]],
+ ["latte parzialmente scremato",5.0,["latte ps","latte parz scremato","latte parzialmente"]],
+ ["latte scremato",5.0,[]],
+ ["latte di capra",4.2,[]],
+ ["latte di pecora",4.8,[]],
+ ["latte di bufala",4.9,[]],
+ ["latte condensato",12.0,["latte condensato zuccherato"]],
+ ["latte evaporato",10.0,[]],
+ ["latte in polvere",38.0,["latte in polvere intero"]],
+ ["cappuccino",4.0,["cappuccio"]],
+ ["caffellatte",4.5,["caffe latte","latte macchiato","latte e caffe"]],
+ ["caffè macchiato",1.5,["caffe macchiato","macchiato","macchiatone"]],
+ ["marocchino",2.0,[]],
+ ["cioccolata calda",4.0,["cioccolata in tazza"]],
+ ["frullato con latte",3.5,["frullato","milkshake","frappè","frappe"]],
+ ["latte e cereali",4.0,["cereali con latte"]],
+ // --- Yogurt e fermentati ---
+ ["yogurt intero",4.0,["yogurt","yogurt bianco","yogurt naturale","yogurt magro"]],
+ ["yogurt alla frutta",3.5,["yogurt frutta"]],
+ ["yogurt greco",3.0,["greco","yogurt greco intero","yogurt greco 0%"]],
+ ["skyr",3.0,[]],
+ ["kefir",3.5,[]],
+ ["yogurt da bere",3.8,["yogurt liquido"]],
+ ["latticello",4.5,[]],
+ // --- Panna, burro, grassi ---
+ ["panna fresca",3.0,["panna","panna liquida","panna da montare"]],
+ ["panna montata",2.8,["panna spray"]],
+ ["panna da cucina",3.5,["panna uht","panna chef"]],
+ ["panna acida",3.0,["sour cream"]],
+ ["burro",0.6,[]],
+ ["burro chiarificato",0,["ghee"]],
+ ["margarina",0.1,[]],
+ // --- Formaggi freschi ---
+ ["mozzarella",0.7,["fior di latte","mozzarella vaccina"]],
+ ["mozzarella di bufala",0.5,["bufala"]],
+ ["burrata",1.5,[]],
+ ["stracciatella",2.0,[]],
+ ["stracchino",1.5,["crescenza"]],
+ ["robiola",2.3,[]],
+ ["squacquerone",2.0,[]],
+ ["ricotta",3.5,["ricotta vaccina","ricotta fresca"]],
+ ["ricotta di pecora",3.0,[]],
+ ["ricotta salata",1.0,[]],
+ ["mascarpone",2.5,[]],
+ ["formaggio spalmabile",3.0,["philadelphia","formaggio fresco spalmabile","spalmabile"]],
+ ["fiocchi di latte",3.0,["cottage cheese","cottage"]],
+ ["primo sale",2.0,[]],
+ ["caprino fresco",1.5,["caprino","formaggio di capra fresco"]],
+ ["quark",3.5,[]],
+ ["feta",0.5,[]],
+ ["halloumi",1.0,[]],
+ ["sottilette",5.0,["formaggio a fette","formaggio fuso","formaggini","mio"]],
+ // --- Formaggi semi-stagionati e stagionati ---
+ ["parmigiano reggiano",0,["parmigiano","parmigiano grattugiato","grattugiato"]],
+ ["grana padano",0,["grana"]],
+ ["pecorino romano",0.1,["pecorino","pecorino sardo","pecorino toscano"]],
+ ["provolone",0.1,["provola"]],
+ ["caciocavallo",0.1,[]],
+ ["gorgonzola",0.1,["gorgonzola dolce","gorgonzola piccante"]],
+ ["taleggio",0.1,[]],
+ ["fontina",0.1,[]],
+ ["emmental",0.1,["groviera","gruyere","svizzero"]],
+ ["asiago",0.5,["asiago fresco","asiago stagionato"]],
+ ["montasio",0.1,[]],
+ ["scamorza",0.5,["scamorza affumicata"]],
+ ["edamer",0.1,["edam","gouda"]],
+ ["cheddar",0.1,[]],
+ ["brie",0.1,["camembert"]],
+ ["bel paese",0.5,[]],
+ ["italico",0.5,[]],
+ ["caciotta",1.0,["caciotta fresca"]],
+ ["formaggio stagionato",0.1,[]],
+ ["formaggio fresco",2.0,["formaggio molle"]],
+ // --- Dolci e gelati ---
+ ["gelato alla crema",5.5,["gelato","gelato fior di latte","gelato al cioccolato","gelato alla nocciola","gelato al pistacchio","gelato alla stracciatella","cono gelato","coppetta"]],
+ ["sorbetto",0,["gelato alla frutta","granita","ghiacciolo"]],
+ ["semifreddo",4.0,[]],
+ ["besciamella",4.0,["balsamella"]],
+ ["budino",4.0,["budino al cioccolato","budino alla vaniglia"]],
+ ["panna cotta",3.5,[]],
+ ["crème caramel",4.5,["creme caramel"]],
+ ["tiramisù",2.0,["tiramisu"]],
+ ["cheesecake",3.0,[]],
+ ["crema pasticcera",3.0,["crema"]],
+ ["crema chantilly",3.0,["chantilly"]],
+ ["cannolo siciliano",2.5,["cannolo","cannoli"]],
+ ["sfogliatella",1.5,["sfogliatelle"]],
+ ["cassata",2.5,[]],
+ ["profiteroles",3.0,["bignè","bigne"]],
+ ["torta margherita",1.5,["torta","ciambellone","pan di spagna"]],
+ ["crostata",1.0,[]],
+ ["cioccolato al latte",8.0,[]],
+ ["cioccolato bianco",9.0,[]],
+ ["cioccolato fondente",0.5,["fondente"]],
+ ["crema spalmabile alla nocciola",5.0,["nutella","crema alla nocciola"]],
+ ["barretta al cioccolato",5.0,["snack al cioccolato","kinder"]],
+ ["cornetto",1.0,["brioche","croissant"]],
+ ["cornetto alla crema",2.0,["brioche alla crema"]],
+ ["biscotti al latte",2.0,["biscotti","frollini","biscotti secchi"]],
+ ["merendina",2.0,["merendine","plumcake"]],
+ ["pandoro",1.5,["panettone"]],
+ // --- Piatti salati ---
+ ["pizza margherita",1.0,["pizza","pizza al taglio","pizza 4 formaggi","pizza quattro formaggi"]],
+ ["lasagne",1.5,["lasagna","lasagne alla bolognese"]],
+ ["pasta al forno",1.0,["pasta gratinata"]],
+ ["pasta cacio e pepe",0.3,["cacio e pepe","carbonara","pasta alla carbonara"]],
+ ["pasta ai quattro formaggi",1.5,["pasta 4 formaggi"]],
+ ["pasta panna e prosciutto",1.0,["pasta alla panna","pasta con panna"]],
+ ["risotto alla parmigiana",0.2,["risotto","risotto alla milanese"]],
+ ["gnocchi alla sorrentina",0.5,[]],
+ ["parmigiana di melanzane",0.5,["parmigiana"]],
+ ["mozzarella in carrozza",0.8,[]],
+ ["supplì",0.5,["suppli","arancino","arancini"]],
+ ["quiche",1.5,["torta salata"]],
+ ["crespelle",2.0,["crepes","crêpes"]],
+ ["purè di patate",1.5,["pure","purè","pure di patate"]],
+ ["toast prosciutto e formaggio",1.0,["toast"]],
+ ["piadina con stracchino",0.7,["piadina"]],
+ ["cordon bleu",0.5,[]],
+ ["salsa ai formaggi",2.0,["fonduta"]],
+ ["pesto alla genovese",0.1,["pesto"]],
+ // --- Salumi e altro ---
+ ["prosciutto cotto",0.5,["cotto"]],
+ ["mortadella",0.2,[]],
+ ["wurstel",0.5,["würstel","salsiccia"]],
+ ["pane al latte",2.0,["pan bauletto","pancarrè","pancarre","pan carre"]],
+ ["pane comune",0,["pane","pane bianco","pane integrale","grissini","crackers"]],
+ // --- Senza latticini (riferimento) ---
+ ["caffè",0,["caffe","espresso","caffè amaro"]],
+ ["bevanda di soia",0,["latte di soia","soia"]],
+ ["bevanda di avena",0,["latte di avena","avena"]],
+ ["bevanda di mandorla",0,["latte di mandorla"]],
+ ["bevanda di riso",0,["latte di riso"]]
+];
+function norm(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\s+/g," ").trim(); }
+var KEYS = [];
+FOODS.forEach(function(f){ [f[0]].concat(f[2]).forEach(function(k){ KEYS.push({k:norm(k),name:f[0],v:f[1]}); }); });
+
+function lookup(q){
+  var n = norm(q); if(!n) return null;
+  if(S.custom[n]) return {name:q,v:S.custom[n].v,src:S.custom[n].src};
+  var i, best=null;
+  for(i=0;i<KEYS.length;i++) if(KEYS[i].k===n) return {name:KEYS[i].name,v:KEYS[i].v,src:"tabella"};
+  for(i=0;i<KEYS.length;i++){
+    var k=KEYS[i].k;
+    if((" "+n+" ").indexOf(" "+k+" ")>=0 && (!best || k.length>best.k.length)) best=KEYS[i];
+  }
+  return best ? {name:best.name,v:best.v,src:"tabella"} : null;
+}
+
+// ---------- Helpers ----------
+var $ = function(id){ return document.getElementById(id); };
+function pad(n){ return (n<10?"0":"")+n; }
+function dayKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function hm(d){ return pad(d.getHours())+":"+pad(d.getMinutes()); }
+function fmt(n,dec){ return Number(n).toLocaleString("it-IT",{minimumFractionDigits:dec,maximumFractionDigits:dec}); }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+var MONTHS=["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
+var WD=["domenica","lunedì","martedì","mercoledì","giovedì","venerdì","sabato"];
+var INT=["","Lieve","Moderata","Marcata","Forte","Molto forte"];
+function toast(m){ var t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(toast.h); toast.h=setTimeout(function(){t.classList.remove("on");},1600); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+var today = new Date(); today.setHours(0,0,0,0);
+var sel = new Date(today);
+var hashDay = /^#d(\d{4})(\d{2})(\d{2})$/.exec(location.hash||"");
+if(hashDay){ var hd=new Date(+hashDay[1],+hashDay[2]-1,+hashDay[3]); if(!isNaN(hd) && hd<=today) sel=hd; }
+
+function entriesOn(d){
+  var k=dayKey(d);
+  return S.entries.filter(function(e){ return dayKey(new Date(e.t))===k; }).sort(function(a,b){return a.t-b.t;});
+}
+function dayStats(d){
+  var es=entriesOn(d), lat=0, n=0, si=0;
+  es.forEach(function(e){ if(e.type==="food") lat+=e.lactose; else { n++; si+=e.intensity; } });
+  return {lat:lat,n:n,avg:n?si/n:null};
+}
+
+// ---------- Persistence (local, on this device) ----------
+var storageOk=true;
+function changed(){
+  S.updatedAt=Date.now();
+  try{ localStorage.setItem(LS, JSON.stringify(S)); storageOk=true; }
+  catch(e){ storageOk=false; toast("Errore di salvataggio: spazio esaurito?"); }
+  renderBackupInfo();
+}
+if(navigator.storage && navigator.storage.persist){ try{ navigator.storage.persist(); }catch(e){} }
+
+// ---------- Rendering ----------
+function renderDay(){
+  var isToday = dayKey(sel)===dayKey(today);
+  $("daylbl").innerHTML = (isToday?"Oggi":WD[sel.getDay()].replace(/^./,function(c){return c.toUpperCase();}))+
+    "<small>"+sel.getDate()+" "+MONTHS[sel.getMonth()]+" "+sel.getFullYear()+"</small>";
+  $("next").disabled = isToday;
+  var st=dayStats(sel);
+  $("sLat").innerHTML = fmt(st.lat,1)+" <small>g</small>";
+  $("sN").textContent = st.n;
+  $("sI").innerHTML = st.avg==null ? "–" : fmt(st.avg,1)+" <small>/5</small>";
+  renderList(); renderTimeline(); renderTrend();
+}
+
+function renderList(){
+  var es=entriesOn(sel), ul=$("list");
+  if(!es.length){ ul.innerHTML='<li class="empty">Nessuna registrazione per questo giorno.</li>'; return; }
+  ul.innerHTML = es.map(function(e){
+    var d=new Date(e.t), desc;
+    if(e.type==="food") desc = '<span class="dot" style="background:var(--s1)"></span><div class="d">'+esc(e.food)+' · '+fmt(e.grams,0)+' g<br><small>'+fmt(e.lactose,1)+' g lattosio ('+fmt(e.per100,1)+' g/100 g, '+esc(e.src)+')</small></div>';
+    else desc = '<span class="dot" style="background:var(--s2)"></span><div class="d">Episodio · intensità '+e.intensity+'/5<br><small>'+INT[e.intensity]+'</small></div>';
+    return '<li><span class="t">'+hm(d)+'</span>'+desc+'<button class="del" data-id="'+e.id+'" aria-label="Elimina">Elimina</button></li>';
+  }).join("");
+}
+$("list").addEventListener("click",function(ev){
+  var b=ev.target.closest(".del"); if(!b) return;
+  if(!b.classList.contains("armed")){
+    document.querySelectorAll(".del.armed").forEach(function(x){x.classList.remove("armed");x.textContent="Elimina";});
+    b.classList.add("armed"); b.textContent="Conferma"; return;
+  }
+  var id=b.getAttribute("data-id");
+  S.entries=S.entries.filter(function(e){return e.id!==id;});
+  changed(); renderDay(); toast("Voce eliminata");
+});
+
+var NS="http://www.w3.org/2000/svg";
+function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+function barPath(x,y,w,h,r){ // rounded top, square base
+  if(h<=0) return "";
+  r=Math.min(r,w/2,h);
+  return "M"+x+","+(y+h)+"V"+(y+r)+"Q"+x+","+y+" "+(x+r)+","+y+"H"+(x+w-r)+"Q"+(x+w)+","+y+" "+(x+w)+","+(y+r)+"V"+(y+h)+"Z";
+}
+
+function renderTimeline(){
+  var svg=$("timeline"); svg.innerHTML="";
+  var L=8,R=332,W=R-L, foodY=26, baseY=78;
+  function X(t){ var d=new Date(t); return L+W*((d.getHours()*60+d.getMinutes())/1440); }
+  [0,6,12,18,24].forEach(function(h){
+    var x=L+W*h/24;
+    svg.appendChild(el("line",{x1:x,x2:x,y1:6,y2:baseY,stroke:"var(--grid)","stroke-width":1}));
+    var t=el("text",{x:x,y:92,"text-anchor":h===0?"start":h===24?"end":"middle"}); t.textContent=pad(h)+":00"; svg.appendChild(t);
+  });
+  svg.appendChild(el("line",{x1:L,x2:R,y1:baseY,y2:baseY,stroke:"var(--line)","stroke-width":1}));
+  var es=entriesOn(sel);
+  es.forEach(function(e){
+    var x=X(e.t), g=el("g",{style:"cursor:pointer"}), txt;
+    if(e.type==="food"){
+      var r=Math.max(4,Math.min(12,3+Math.sqrt(e.lactose)*2));
+      g.appendChild(el("circle",{cx:x,cy:foodY,r:r,fill:"var(--s1)",stroke:"var(--surface)","stroke-width":2}));
+      txt=hm(new Date(e.t))+" · "+e.food+", "+fmt(e.grams,0)+" g → "+fmt(e.lactose,1)+" g lattosio";
+    } else {
+      var h=e.intensity*7;
+      g.appendChild(el("path",{d:barPath(x-2.5,baseY-h,5,h,2),fill:"var(--s2)"}));
+      txt=hm(new Date(e.t))+" · episodio, intensità "+e.intensity+"/5 ("+INT[e.intensity].toLowerCase()+")";
+    }
+    g.appendChild(el("rect",{x:x-9,y:4,width:18,height:baseY-4,fill:"transparent"}));
+    g.addEventListener("pointerenter",function(){ $("tlRead").textContent=txt; });
+    g.addEventListener("click",function(){ $("tlRead").textContent=txt; });
+    svg.appendChild(g);
+  });
+  if(!es.length) $("tlRead").textContent="Nessun dato per questo giorno.";
+  else $("tlRead").textContent="Tocca un punto per i dettagli.";
+}
+
+function last14(){
+  var out=[]; for(var i=13;i>=0;i--){ var d=new Date(sel); d.setDate(d.getDate()-i); var s=dayStats(d); s.d=d; out.push(s); } return out;
+}
+function niceMax(v){ if(v<=0) return 1; var p=Math.pow(10,Math.floor(Math.log10(v))), m=v/p; return (m<=1?1:m<=2?2:m<=5?5:10)*p; }
+function barChart(svg,readout,days,key,color,unit,dec){
+  svg.innerHTML="";
+  var L=26,R=336,T=8,B=92,W=R-L,H=B-T, n=days.length, slot=W/n, bw=Math.max(6,slot-6);
+  var max=niceMax(Math.max.apply(null,days.map(function(d){return d[key];})));
+  [0,max/2,max].filter(function(v){ return dec>0 || v%1===0; }).forEach(function(v){
+    var y=B-H*v/max;
+    svg.appendChild(el("line",{x1:L,x2:R,y1:y,y2:y,stroke:v?"var(--grid)":"var(--line)","stroke-width":1}));
+    var t=el("text",{x:L-4,y:y+3,"text-anchor":"end"}); t.textContent=fmt(v,v%1?1:0); svg.appendChild(t);
+  });
+  days.forEach(function(d,i){
+    var x=L+i*slot+(slot-bw)/2, h=H*d[key]/max;
+    var g=el("g",{style:"cursor:pointer"});
+    if(h>0) g.appendChild(el("path",{d:barPath(x,B-h,bw,h,4),fill:color}));
+    g.appendChild(el("rect",{x:L+i*slot,y:T,width:slot,height:H,fill:"transparent"}));
+    var msg=d.d.getDate()+" "+MONTHS[d.d.getMonth()]+": "+fmt(d[key],dec)+" "+unit;
+    function show(){ readout.textContent=msg; }
+    g.addEventListener("pointerenter",show); g.addEventListener("click",show);
+    svg.appendChild(g);
+    if(i===0||i===n-1||i===Math.floor(n/2)){
+      var t=el("text",{x:x+bw/2,y:106,"text-anchor":i===0?"start":i===n-1?"end":"middle"});
+      t.textContent=d.d.getDate()+" "+MONTHS[d.d.getMonth()]; svg.appendChild(t);
+    }
+  });
+  readout.textContent="Tocca una barra per il valore.";
+}
+function renderTrend(){
+  var days=last14();
+  barChart($("c1"),$("r1"),days,"lat","var(--s1)","g di lattosio",1);
+  barChart($("c2"),$("r2"),days,"n","var(--s2)","episodi",0);
+  $("tbl").innerHTML="<table><thead><tr><th>Giorno</th><th>Lattosio (g)</th><th>Episodi</th><th>Int. media</th></tr></thead><tbody>"+
+    days.slice().reverse().map(function(d){return "<tr><td>"+d.d.getDate()+" "+MONTHS[d.d.getMonth()]+"</td><td>"+fmt(d.lat,1)+"</td><td>"+d.n+"</td><td>"+(d.avg==null?"–":fmt(d.avg,1))+"</td></tr>";}).join("")+"</tbody></table>";
+  // Simple comparison: days with high vs low lactose (needs enough data)
+  var logged=days.filter(function(d){return d.lat>0||d.n>0;});
+  var hi=logged.filter(function(d){return d.lat>=10;}), lo=logged.filter(function(d){return d.lat<10;});
+  function avg(a){ return a.reduce(function(s,d){return s+d.n;},0)/a.length; }
+  $("insight").textContent = (hi.length>=3 && lo.length>=3)
+    ? "Nei giorni con almeno 10 g di lattosio: in media "+fmt(avg(hi),1)+" episodi; nei giorni sotto 10 g: "+fmt(avg(lo),1)+". È solo un confronto indicativo, non una diagnosi."
+    : "Con almeno 3 giorni sopra e 3 sotto i 10 g di lattosio comparirà qui un confronto tra i due gruppi.";
+}
+$("tblToggle").onclick=function(){
+  var showT=$("tbl").classList.toggle("hidden")===false;
+  $("charts").classList.toggle("hidden",showT);
+  this.textContent=showT?"Grafici":"Tabella";
+};
+
+// ---------- Day navigation ----------
+function go(delta){ sel.setDate(sel.getDate()+delta); if(sel>today) sel=new Date(today);
+  try{ history.replaceState(null,"",dayKey(sel)===dayKey(today)?location.pathname+location.search:"#d"+dayKey(sel).replace(/-/g,"")); }catch(e){}
+  resetTimes(); renderDay(); }
+$("prev").onclick=function(){go(-1);};
+$("next").onclick=function(){go(1);};
+
+// ---------- Time fields (follow the clock until edited) ----------
+var timeEdited={fTime:false,cTime:false};
+function resetTimes(){ var n=hm(new Date()); ["fTime","cTime"].forEach(function(id){ timeEdited[id]=false; $(id).value=n; }); }
+["fTime","cTime"].forEach(function(id){ $(id).addEventListener("input",function(){timeEdited[id]=true;}); });
+setInterval(function(){ var n=hm(new Date()); ["fTime","cTime"].forEach(function(id){ if(!timeEdited[id]) $(id).value=n; }); },20000);
+function stamp(id){
+  var v=$(id).value||hm(new Date()), p=v.split(":"), d=new Date(sel); d.setHours(+p[0],+p[1],0,0); return d.getTime();
+}
+
+// ---------- Episodes ----------
+$("intens").innerHTML=[1,2,3,4,5].map(function(i){return '<button data-i="'+i+'"><b>'+i+'</b><span>'+INT[i]+'</span></button>';}).join("");
+$("intens").addEventListener("click",function(ev){
+  var b=ev.target.closest("button"); if(!b) return;
+  var i=+b.getAttribute("data-i"), t=stamp("fTime");
+  S.entries.push({id:uid(),type:"fart",t:t,intensity:i});
+  changed(); timeEdited.fTime=false; $("fTime").value=hm(new Date());
+  renderDay(); toast("Episodio registrato · "+hm(new Date(t))+" · "+i+"/5");
+});
+
+// ---------- Foods ----------
+function fillDatalist(){
+  $("foodlist").innerHTML = FOODS.map(function(f){return '<option value="'+esc(f[0])+'">';}).join("") +
+    Object.keys(S.custom).map(function(k){return '<option value="'+esc(S.custom[k].label||k)+'">';}).join("");
+}
+fillDatalist();
+
+var cur={src:null,v:null,match:null}, perEdited=false;
+function updateEstimate(){
+  var name=$("food").value.trim(), grams=parseFloat($("grams").value);
+  if(!perEdited){
+    var m=lookup(name);
+    cur = m ? {src:m.src,v:m.v,match:m.name} : {src:null,v:null,match:null};
+    $("per100").value = m ? m.v : "";
+  }
+  var per=parseFloat($("per100").value), est=$("est");
+  if(!name){ est.innerHTML="Inserisci alimento e peso: il lattosio viene stimato automaticamente."; }
+  else if(isNaN(per)){
+    est.innerHTML = "Alimento non presente in tabella. Inserisci il lattosio per 100 g (lo trovi in etichetta tra i carboidrati, voce “di cui zuccheri”, nei latticini senza zuccheri aggiunti).";
+  } else {
+    var srcTxt = perEdited ? "valore inserito da te" : cur.src==="tabella" ? (norm(cur.match)===norm(name)?"tabella":"tabella, come “"+esc(cur.match)+"”") : "valore salvato in precedenza";
+    est.innerHTML = isNaN(grams)||grams<=0
+      ? "Contenuto: <b>"+fmt(per,1)+" g</b> di lattosio per 100 g <small>("+srcTxt+")</small>. Inserisci il peso."
+      : "Lattosio stimato: <b>"+fmt(grams*per/100,1)+" g</b> <small>("+fmt(per,1)+" g/100 g, "+srcTxt+")</small>";
+  }
+  $("saveFood").disabled = !(name && grams>0 && !isNaN(per) && per>=0);
+}
+$("food").addEventListener("input",function(){ perEdited=false; updateEstimate(); });
+$("grams").addEventListener("input",updateEstimate);
+$("per100").addEventListener("input",function(){ perEdited=true; updateEstimate(); });
+
+$("saveFood").onclick=function(){
+  var name=$("food").value.trim(), grams=parseFloat($("grams").value), per=parseFloat($("per100").value);
+  if(!(name && grams>0 && per>=0)) return;
+  var src = perEdited ? "manuale" : (cur.src||"manuale");
+  if(src!=="tabella"){ S.custom[norm(name)]={v:per,src:src,label:name}; }
+  var t=stamp("cTime"), lac=Math.round(grams*per/10)/10;
+  S.entries.push({id:uid(),type:"food",t:t,food:name,grams:grams,per100:per,lactose:lac,src:src});
+  changed();
+  $("food").value=""; $("grams").value=""; $("per100").value=""; perEdited=false; cur={src:null,v:null,match:null};
+  timeEdited.cTime=false; $("cTime").value=hm(new Date());
+  fillDatalist(); updateEstimate(); renderDay(); toast("Alimento salvato · "+fmt(lac,1)+" g lattosio");
+};
+
+// ---------- Export & backup ----------
+function download(name,text,type){
+  try{
+    var blob=new Blob([text],{type:type}), url=URL.createObjectURL(blob), a=document.createElement("a");
+    a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},2000); return true;
+  }catch(e){ return false; }
+}
+function stampName(){ var d=new Date(); return dayKey(d)+"_"+pad(d.getHours())+pad(d.getMinutes()); }
+$("csv").onclick=function(){
+  var rows=[["data","ora","tipo","alimento","peso_g","lattosio_g_100g","lattosio_g","intensita","fonte"]];
+  S.entries.slice().sort(function(a,b){return a.t-b.t;}).forEach(function(e){
+    var d=new Date(e.t);
+    rows.push(e.type==="food"?[dayKey(d),hm(d),"alimento",e.food,e.grams,String(e.per100).replace(".",","),String(e.lactose).replace(".",","),"",e.src]:[dayKey(d),hm(d),"episodio","","","","",e.intensity,""]);
+  });
+  var csv="\ufeff"+rows.map(function(r){return r.map(function(c){c=String(c);return /[",;\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c;}).join(";");}).join("\n");
+  toast(download("diario-lattosio_"+stampName()+".csv",csv,"text/csv;charset=utf-8")?"CSV esportato":"Esportazione non riuscita");
+};
+$("backup").onclick=function(){
+  if(download("backup-diario-lattosio_"+stampName()+".json",JSON.stringify(S,null,1),"application/json")){
+    try{ localStorage.setItem(LSB,String(Date.now())); }catch(e){}
+    renderBackupInfo(); toast("Backup salvato");
+  } else toast("Backup non riuscito");
+};
+$("restoreBtn").onclick=function(){ $("restore").click(); };
+var restoreArmed=null;
+$("restore").onchange=function(){
+  var f=this.files&&this.files[0]; this.value=""; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){
+    var D; try{ D=JSON.parse(r.result); }catch(e){ D=null; }
+    if(!D||!Array.isArray(D.entries)){ toast("File di backup non valido"); return; }
+    // merge: keep everything, skip entries already present
+    var ids={}; S.entries.forEach(function(e){ids[e.id]=1;});
+    var added=0; D.entries.forEach(function(e){ if(e&&e.id&&!ids[e.id]&&(e.type==="food"||e.type==="fart")){ S.entries.push(e); added++; } });
+    if(D.custom) for(var k in D.custom) if(!S.custom[k]) S.custom[k]=D.custom[k];
+    changed(); renderDay(); fillDatalist(); toast("Ripristinate "+added+" voci");
+  };
+  r.readAsText(f);
+};
+function renderBackupInfo(){
+  var last=0; try{ last=+localStorage.getItem(LSB)||0; }catch(e){}
+  var n=S.entries.length;
+  var txt=n+" voci registrate. ";
+  txt += last ? "Ultimo backup: "+new Date(last).toLocaleDateString("it-IT")+"." : "Nessun backup ancora.";
+  if(n>0 && (!last || Date.now()-last>14*864e5)) txt+=" Ti consiglio di salvarne uno: se cancelli i dati del browser o cambi telefono, il backup è l'unico modo per recuperarli.";
+  $("backupInfo").textContent=txt;
+  if(!storageOk) $("sync").textContent="Attenzione: l'ultimo salvataggio non è riuscito.";
+}
+
+// ---------- Start ----------
+resetTimes(); renderDay(); updateEstimate(); renderBackupInfo();
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="visible"){ var t=new Date(); t.setHours(0,0,0,0);
+    if(t.getTime()!==today.getTime()){ var wasToday=dayKey(sel)===dayKey(today); today=t; if(wasToday) sel=new Date(today); resetTimes(); renderDay(); } }
+});
+if("serviceWorker" in navigator && location.protocol!=="file:"){
+  window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+}
+})();
+</script>
+</body>
+</html>
